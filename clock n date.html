@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Calendar & Clock</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles to refine the look and feel */
+        body {
+            font-family: 'Arial Narrow', Arial, sans-serif;
+            background-color: #191919; /* Background color of the entire page */
+        }
+        /* Custom color for all text */
+        .text-custom-green {
+            color: #8ACE00;
+        }
+        /* Custom background color for the content box */
+        .bg-custom-dark {
+            background-color: #191919; /* Match the body background */
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen text-gray-100 p-4">
+    <div class="bg-custom-dark p-8 rounded-xl shadow-lg w-full max-w-sm flex flex-col items-start space-y-4">
+        <!-- Greeting -->
+        <div id="greeting" class="text-4xl md:text-5xl font-bold text-custom-green">
+            <!-- Good Morning/Afternoon/Evening -->
+        </div>
+
+        <!-- Date Display -->
+        <div id="date-display" class="text-xl md:text-2xl font-medium text-custom-green">
+            <!-- Friday, July 25, 2025 -->
+        </div>
+
+        <!-- Time Display -->
+        <div id="time-display" class="text-3xl md:text-4xl font-semibold text-custom-green">
+            <!-- 10:11:01 AM -->
+        </div>
+    </div>
+
+    <script>
+        // Function to update the clock and date
+        function updateClock() {
+            const now = new Date(); // Get the current date and time
+
+            // --- Update Greeting ---
+            const hours = now.getHours();
+            let greetingText = '';
+            if (hours >= 5 && hours < 12) {
+                greetingText = 'Good Morning';
+            } else if (hours >= 12 && hours < 18) {
+                greetingText = 'Good Afternoon';
+            } else {
+                greetingText = 'Good Evening';
+            }
+            document.getElementById('greeting').textContent = greetingText;
+
+            // --- Update Date ---
+            const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateString = now.toLocaleDateString('en-US', optionsDate);
+            document.getElementById('date-display').textContent = dateString;
+
+            // --- Update Time ---
+            const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            const timeString = now.toLocaleTimeString('en-US', optionsTime);
+            document.getElementById('time-display').textContent = timeString;
+        }
+
+        // Initial call to set the clock immediately
+        updateClock();
+
+        // Update the clock every second (1000 milliseconds)
+        setInterval(updateClock, 1000);
+    </script>
+</body>
+</html>
