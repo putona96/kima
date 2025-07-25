@@ -1,178 +1,306 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Calendar & Clock</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Reloj Digital</title>
+    <!-- Script para cargar la fuente Roboto Condensed de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Estilos personalizados para refinar la apariencia */
+        /* Estilos generales del cuerpo de la página */
         body {
-            font-family: 'Arial Narrow', Arial, sans-serif;
-            background-color: #191919; /* Color de fondo de toda la página */
-        }
-        /* Color personalizado para todo el texto */
-        .text-custom-green {
-            color: #8ACE00;
-        }
-        /* Color de fondo personalizado para el cuadro de contenido */
-        .bg-custom-dark {
-            background-color: #191919; /* Coincide con el fondo del cuerpo */
-        }
-        /* Estilos para el botón de carga */
-        .loader {
-            border: 4px solid #f3f3f3; /* Light grey */
-            border-top: 4px solid #8ACE00; /* Green */
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 2s linear infinite;
-            margin-right: 12px; /* Espacio a la derecha del cargador */
+            font-family: 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif;
+            background-color: #191919; /* Fondo gris oscuro, casi negro */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Alinea los elementos al inicio (izquierda) como en la imagen */
+            justify-content: center; /* Centra el contenido verticalmente */
+            padding: min(40px, 5vw); /* CAMBIO: Padding responsivo */
+            margin: 0;
+            min-height: 100vh; /* Asegura que el cuerpo ocupe al menos toda la altura de la ventana */
+            box-sizing: border-box;
+            color: #E0E0E0; /* Color de texto general para el cuerpo (ahora aplicado a elementos específicos) */
+            overflow: hidden; /* Evita barras de desplazamiento si el contenido no desborda */
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* Estilos para el saludo (Good Morning/Afternoon/Evening) */
+        #greeting {
+            font-size: min(3em, 6vw); /* CAMBIO: Tamaño de fuente responsivo */
+            color: #8ACE00; /* Verde brillante */
+            margin-bottom: 0;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        /* Estilos para la fecha */
+        #date {
+            font-size: min(1.5em, 3vw); /* CAMBIO: Tamaño de fuente responsivo */
+            color: #8ACE00; /* Verde brillante */
+            margin-top: 0;
+            opacity: 0.9;
+        }
+
+        /* Estilos para la hora */
+        #time {
+            font-size: min(4em, 8vw); /* CAMBIO: Tamaño de fuente responsivo */
+            color: #8ACE00; /* Verde brillante */
+            font-weight: 700; /* Negrita para la hora */
+            margin-top: 10px;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        /* Estilos para el botón de "Daily Fact" */
+        #daily-fact-btn {
+            background-color: #8ACE00; /* Verde vibrante */
+            color: black;
+            padding: min(12px, 2.5vw) min(25px, 5vw); /* CAMBIO: Padding responsivo */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: min(1.1em, 2vw); /* CAMBIO: Tamaño de fuente responsivo */
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease, color 0.3s ease;
+            font-family: 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: min(8px, 1.5vw); /* CAMBIO: Gap responsivo */
+        }
+
+        #daily-fact-btn:hover {
+            background-color: #000000;
+            color: #8ACE00;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #8ACE00; /* Mantener solo el "glow" verde si es deseado */
+        }
+
+        #daily-fact-btn:active {
+            background-color: #1a1a1a;
+            color: #8ACE00;
+            transform: scale(0.95);
+        }
+
+        /* Icono SVG para el botón "Daily Fact" */
+        #daily-fact-btn svg {
+            width: min(20px, 3.5vw); /* CAMBIO: Tamaño responsivo para el SVG */
+            height: min(20px, 3.5vw); /* CAMBIO: Tamaño responsivo para el SVG */
+            fill: currentColor;
+            vertical-align: middle;
+        }
+
+        /* Estilos para el área de texto del dato curioso */
+        #fact-display {
+            background-color: #2D2D2D;
+            color: #E0E0E0;
+            padding: min(15px, 3vw) min(20px, 4vw); /* CAMBIO: Padding responsivo */
+            border-radius: 8px;
+            margin-top: min(20px, 3vw); /* CAMBIO: Margen responsivo */
+            font-size: min(1.1em, 2vw); /* CAMBIO: Tamaño de fuente responsivo */
+            line-height: 1.5;
+            max-width: min(500px, 90vw); /* CAMBIO: Ancho máximo responsivo */
+            min-height: min(50px, 8vw); /* CAMBIO: Altura mínima responsiva */
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-out;
+            text-align: left;
+        }
+
+        #fact-display.show {
+            display: block;
+            opacity: 1;
+        }
+
+        /* --------------------------------------------------------------------------------------- */
+        /* Media Queries para Refinar la Responsividad (Ajustes de "min" en vw/em) */
+        /* --------------------------------------------------------------------------------------- */
+
+        @media (max-width: 768px) {
+            body {
+                padding: min(30px, 4vw); /* Ajusta padding para tabletas */
+            }
+            #greeting {
+                font-size: min(2.5em, 5.5vw);
+            }
+            #date {
+                font-size: min(1.2em, 2.8vw);
+            }
+            #time {
+                font-size: min(3.5em, 7.5vw);
+            }
+            #daily-fact-btn {
+                font-size: min(1em, 1.8vw);
+            }
+            #daily-fact-btn svg {
+                width: min(18px, 3vw);
+                height: min(18px, 3vw);
+            }
+            #fact-display {
+                font-size: min(1em, 1.8vw);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: min(20px, 3vw); /* Ajusta padding para móviles */
+            }
+            #greeting {
+                font-size: min(2em, 5vw);
+            }
+            #date {
+                font-size: min(1em, 2.5vw);
+            }
+            #time {
+                font-size: min(2.8em, 6.5vw);
+                letter-spacing: 1px;
+            }
+            #daily-fact-btn {
+                font-size: min(0.9em, 1.6vw);
+            }
+            #daily-fact-btn svg {
+                width: min(16px, 2.8vw);
+                height: min(16px, 2.8vw);
+            }
+            #fact-display {
+                font-size: min(0.9em, 1.6vw);
+            }
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen text-gray-100 p-4">
-    <div class="bg-custom-dark p-6 rounded-xl shadow-lg w-full max-w-xs flex flex-col items-start space-y-3">
-        <!-- Saludo -->
-        <div id="greeting" class="text-3xl md:text-4xl font-bold text-custom-green">
-            <!-- Buenos días/tardes/noches -->
-        </div>
-
-        <!-- Mostrar Fecha -->
-        <div id="date-display" class="text-base md:text-lg font-medium text-custom-green">
-            <!-- Viernes, 25 de julio de 2025 -->
-        </div>
-
-        <!-- Mostrar Hora -->
-        <div id="time-display" class="text-lg md:text-xl font-semibold text-custom-green">
-            <!-- 10:11:01 AM -->
-        </div>
-
-        <!-- Botón y display de la característica Gemini -->
-        <button id="gemini-fact-button" class="mt-4 px-3 py-1.5 bg-custom-dark text-custom-green font-bold rounded-lg shadow-md border border-solid border-custom-green hover:bg-[#2a2a2a] transition duration-300 ease-in-out flex items-center justify-center text-sm">
-            ✨ Daily Fact
-        </button>
-        <div id="gemini-fact-display" class="mt-2 text-xs text-gray-300 italic min-h-[20px]">
-            <!-- El dato curioso se mostrará aquí -->
-        </div>
-    </div>
+<body>
+    <h1 id="greeting"></h1>
+    <p id="date"></p>
+    <h2 id="time"></h2>
+    <button id="daily-fact-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0L14.7 9.3 24 12 14.7 14.7 12 24 9.3 14.7 0 12 9.3 9.3 12 0z"/>
+        </svg>
+        Daily Fact
+    </button>
+    <div id="fact-display"></div>
 
     <script>
-        // Función para actualizar el reloj y la fecha
+        const greetingElement = document.getElementById('greeting');
+        const dateElement = document.getElementById('date');
+        const timeElement = document.getElementById('time');
+        const dailyFactBtn = document.getElementById('daily-fact-btn');
+        const factDisplay = document.getElementById('fact-display');
+
+        // Gemini API configuration
+        // IMPORTANTE: Deja la API_KEY como una cadena vacía ("") para que Canvas la proporcione automáticamente.
+        const API_KEY = "";
+        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
+        const MAX_RETRIES = 5;
+        const INITIAL_BACKOFF_DELAY = 1000; // 1 second
+
+        /**
+         * Actualiza la hora, fecha y saludo en la interfaz.
+         */
         function updateClock() {
-            const now = new Date(); // Obtener la fecha y hora actuales
+            const now = new Date();
 
-            // --- Actualizar Saludo ---
+            // Actualiza el saludo (adaptado para que coincida con la imagen)
             const hours = now.getHours();
-            let greetingText = '';
-            if (hours >= 5 && hours < 12) {
-                greetingText = 'Good Morning';
-            } else if (hours >= 12 && hours < 18) {
-                greetingText = 'Good Afternoon';
-            } else {
-                greetingText = 'Good Evening';
+            let greeting;
+            if (hours >= 5 && hours < 12) { // 5 AM to 11:59 AM
+                greeting = "Good Morning";
+            } else if (hours >= 12 && hours < 17) { // 12 PM to 4:59 PM
+                greeting = "Good Afternoon";
+            } else if (hours >= 17 && hours < 22) { // 5 PM to 9:59 PM
+                greeting = "Good Evening";
+            } else { // 10 PM to 4:59 AM
+                greeting = "Good Night";
             }
-            document.getElementById('greeting').textContent = greetingText;
+            greetingElement.textContent = greeting;
 
-            // --- Actualizar Fecha ---
+            // Actualiza la fecha
             const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const dateString = now.toLocaleDateString('en-US', optionsDate);
-            document.getElementById('date-display').textContent = dateString;
+            dateElement.textContent = now.toLocaleDateString('en-US', optionsDate); // Usar 'en-US' para el formato en inglés de la imagen
 
-            // --- Actualizar Hora ---
+            // Actualiza la hora (HH:MM:SS AM/PM)
             const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-            const timeString = now.toLocaleTimeString('en-US', optionsTime);
-            document.getElementById('time-display').textContent = timeString;
+            timeElement.textContent = now.toLocaleTimeString('en-US', optionsTime); // Usar 'en-US' para el formato en inglés de la imagen
         }
 
-        // Llamada inicial para establecer el reloj inmediatamente
-        updateClock();
-
-        // Actualizar el reloj cada segundo (1000 milisegundos)
+        // Llama a updateClock cada segundo para mantener el reloj actualizado
         setInterval(updateClock, 1000);
 
-        // --- Integración de la API de Gemini ---
-        const geminiFactButton = document.getElementById('gemini-fact-button');
-        const geminiFactDisplay = document.getElementById('gemini-fact-display');
+        // Llama a updateClock una vez al cargar la página para mostrar la hora de inmediato
+        updateClock();
 
-        // Función para realizar la llamada a la API de Gemini con reintentos
-        async function callGeminiApiWithRetry(prompt, retries = 3, delay = 1000) {
-            // Reemplaza "" con tu clave API de Google AI Studio
-            const apiKey = "AIzaSyAws9WNXwi0MsllH_YtR7FJiYSTAuCfo4A"; 
-            
+        /**
+         * Muestra un dato curioso del día usando la API de Gemini.
+         */
+        async function getDailyFact() {
+            console.log("Botón 'Daily Fact' clicado. Iniciando carga de dato curioso...");
+
+            factDisplay.textContent = 'Cargando dato curioso...';
+            factDisplay.classList.add('show');
+            dailyFactBtn.disabled = true; // Deshabilita el botón durante la carga
+
+            const currentDateText = dateElement.textContent;
+            const prompt = `Genera un dato curioso histórico o significativo relacionado con la fecha "${currentDateText}". No más de 20 palabras y asegúrate de que sea apto para todo público.`;
+
+            try {
+                const fact = await callGeminiAPI(prompt, null, 'Cargando dato...');
+                factDisplay.textContent = fact;
+            } catch (error) {
+                factDisplay.textContent = "No se pudo cargar el dato. Inténtalo de nuevo.";
+                console.error("Error al obtener el dato curioso:", error);
+            } finally {
+                dailyFactBtn.disabled = false; // Habilita el botón de nuevo
+                // Opcional: Ocultar el dato después de un tiempo si no es persistente
+                // setTimeout(() => { factDisplay.classList.remove('show'); }, 10000); // Ocultar después de 10 segundos
+            }
+        }
+
+        dailyFactBtn.addEventListener('click', getDailyFact);
+
+        /**
+         * Función para llamar a la API de Gemini con reintentos y backoff exponencial.
+         * @param {string} prompt - El texto prompt para el LLM.
+         * @param {HTMLElement} [note=null] - (Opcional) Elemento de nota para mostrar el spinner. Aquí no se usa directamente.
+         * @param {string} loadingMessage - Mensaje para el spinner.
+         * @param {number} retries = 0 - Conteo de reintentos actual.
+         * @returns {Promise<string>} - El texto generado.
+         */
+        async function callGeminiAPI(prompt, note, loadingMessage, retries = 0) {
             let chatHistory = [];
             chatHistory.push({ role: "user", parts: [{ text: prompt }] });
             const payload = { contents: chatHistory };
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) {
-                        // Si la respuesta no es OK, y no es el último intento, reintenta
-                        if (i < retries - 1) {
-                            console.warn(`Intento ${i + 1} fallido. Reintentando en ${delay / 1000}s...`);
-                            await new Promise(res => setTimeout(res, delay));
-                            delay *= 2; // Duplicar el retraso para el próximo intento
-                            continue;
-                        } else {
-                            throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
-                        }
-                    }
-
-                    const result = await response.json();
-                    if (result.candidates && result.candidates.length > 0 &&
-                        result.candidates[0].content && result.candidates[0].content.parts &&
-                        result.candidates[0].content.parts.length > 0) {
-                        return result.candidates[0].content.parts[0].text;
-                    } else {
-                        throw new Error("Estructura de respuesta inesperada de la API de Gemini.");
-                    }
-                } catch (error) {
-                    if (i < retries - 1) {
-                        console.error(`Error en el intento ${i + 1}:`, error);
-                        await new Promise(res => setTimeout(res, delay));
-                        delay *= 2;
-                    } else {
-                        throw error;
-                    }
-                }
-            }
-            throw new Error("Todos los reintentos fallaron para la llamada a la API de Gemini.");
-        }
-
-        // Manejador de eventos para el botón del dato curioso
-        geminiFactButton.addEventListener('click', async () => {
-            geminiFactDisplay.textContent = ''; // Limpiar el texto anterior
-            geminiFactButton.disabled = true; // Deshabilitar el botón durante la carga
-            const originalButtonContent = geminiFactButton.innerHTML; // Guardar el contenido original
-            // Asegúrate de que el loader esté antes del texto para que margin-right funcione correctamente
-            geminiFactButton.innerHTML = '<div class="loader"></div>Loading...'; // Mostrar cargador en inglés
 
             try {
-                const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-                const prompt = `Give me an interesting and concise fact about the current date, focusing on historical events, famous birthdays, or scientific discoveries for ${currentDate}. Keep it to one sentence.`;
-                const fact = await callGeminiApiWithRetry(prompt);
-                geminiFactDisplay.textContent = fact;
+                const response = await fetch(GEMINI_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    if (response.status === 429 && retries < MAX_RETRIES) { // Too Many Requests
+                        const delay = INITIAL_BACKOFF_DELAY * Math.pow(2, retries) + Math.random() * 1000;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        return callGeminiAPI(prompt, note, loadingMessage, retries + 1); // Retry
+                    }
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+                }
+
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    return result.candidates[0].content.parts[0].text;
+                } else {
+                    console.error("Unexpected API response structure or no content:", result);
+                    throw new Error('Unexpected API response structure or no content.');
+                }
             } catch (error) {
-                console.error("Error al obtener el dato curioso:", error);
-                geminiFactDisplay.textContent = "Sorry, I couldn't get a daily fact right now. Please try again."; // Mensaje de error en inglés
-            } finally {
-                geminiFactButton.disabled = false; // Habilitar el botón de nuevo
-                geminiFactButton.innerHTML = originalButtonContent; // Restaurar el contenido original
+                console.error('Error calling Gemini API:', error);
+                throw error;
             }
-        });
+        }
+
     </script>
 </body>
 </html>
