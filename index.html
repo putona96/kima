@@ -103,10 +103,12 @@
 
         // Función para realizar la llamada a la API de Gemini con reintentos
         async function callGeminiApiWithRetry(prompt, retries = 3, delay = 1000) {
+            // Reemplaza "" con tu clave API de Google AI Studio
+            const apiKey = "AIzaSyAws9WNXwi0MsllH_YtR7FJiYSTAuCfo4A"; 
+            
             let chatHistory = [];
             chatHistory.push({ role: "user", parts: [{ text: prompt }] });
             const payload = { contents: chatHistory };
-            const apiKey = ""; // La clave API será proporcionada por el entorno de Canvas.
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
             for (let i = 0; i < retries; i++) {
